@@ -10,3 +10,6 @@ config.local.php
 # Dependencias (si usas Composer)
 /vendor/
 composer.lock
+
+# Qwen Code configuration
+.qwen/

@@ -462,394 +462,502 @@ $searchResult = $controller->handleRequest();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Text Search Engine v2.0</title>
+    <title>GrepSearch - Modern Text Search Engine</title>
     <style>
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --border-color: #30363d;
+            --text-primary: #f0f6fc;
+            --text-secondary: #8b949e;
+            --text-muted: #484f58;
+            --accent-primary: #58a6ff;
+            --accent-secondary: #1f6feb;
+            --accent-gradient: linear-gradient(135deg, #58a6ff 0%, #1f6feb 100%);
+            --success-color: #3fb950;
+            --error-color: #f85149;
+            --highlight-bg: rgba(88, 166, 255, 0.15);
+            --highlight-match: rgba(210, 153, 34, 0.4);
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: #f5f5f5;
-            color: #333;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
             line-height: 1.6;
+            min-height: 100vh;
         }
-        
+
         .container {
-            max-width: 1000px;
+            max-width: 1100px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 40px 20px;
         }
-        
+
+        /* Header */
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--accent-gradient);
             color: white;
-            padding: 30px;
-            border-radius: 8px;
+            padding: 40px;
+            border-radius: 12px;
             margin-bottom: 30px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
         }
-        
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
         .header h1 {
-            font-size: 28px;
-            margin-bottom: 8px;
+            font-size: 32px;
+            margin-bottom: 10px;
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
         }
-        
+
         .header p {
             opacity: 0.9;
-            font-size: 14px;
+            font-size: 15px;
+            position: relative;
+            z-index: 1;
         }
-        
+
+        /* Search Form */
         .search-form {
-            background: white;
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background: var(--bg-secondary);
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-md);
             margin-bottom: 30px;
         }
-        
+
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
-        
+
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
-        
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
         label {
             display: block;
-            font-weight: 500;
-            margin-bottom: 6px;
-            color: #555;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
             font-size: 14px;
         }
-        
+
         input[type="text"],
         input[type="number"],
         select {
             width: 100%;
-            padding: 10px 12px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            padding: 12px 14px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-primary);
             font-size: 14px;
-            transition: border-color 0.2s;
+            transition: all 0.2s ease;
         }
-        
+
         input[type="text"]:focus,
         input[type="number"]:focus,
         select:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px var(--highlight-bg);
         }
-        
+
+        input[type="text"]::placeholder {
+            color: var(--text-muted);
+        }
+
         .checkbox-group {
             display: flex;
-            gap: 25px;
+            gap: 24px;
             flex-wrap: wrap;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            padding: 16px;
+            background: var(--bg-primary);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
         }
-        
+
         .checkbox-item {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+            cursor: pointer;
         }
-        
+
         input[type="checkbox"] {
             cursor: pointer;
             width: 18px;
             height: 18px;
-            accent-color: #667eea;
+            accent-color: var(--accent-primary);
         }
-        
+
         .checkbox-item label {
             margin-bottom: 0;
             font-weight: 400;
+            color: var(--text-secondary);
+            cursor: pointer;
         }
-        
+
         .help-text {
             font-size: 12px;
-            color: #888;
-            margin-top: 4px;
+            color: var(--text-muted);
+            margin-top: 6px;
         }
-        
+
         .form-actions {
             display: flex;
-            gap: 10px;
-            margin-top: 20px;
+            gap: 12px;
+            margin-top: 24px;
         }
-        
+
         button {
-            padding: 11px 24px;
+            padding: 12px 28px;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
         }
-        
+
         .btn-primary {
-            background: #667eea;
+            background: var(--accent-gradient);
             color: white;
+            box-shadow: var(--shadow-sm);
         }
-        
+
         .btn-primary:hover {
-            background: #5568d3;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(88, 166, 255, 0.3);
         }
-        
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
         .btn-secondary {
-            background: #e0e0e0;
-            color: #333;
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
         }
-        
+
         .btn-secondary:hover {
-            background: #d0d0d0;
+            background: var(--border-color);
+            color: var(--text-primary);
         }
-        
+
+        /* Alerts */
         .alert {
-            padding: 15px;
-            border-radius: 4px;
+            padding: 16px 20px;
+            border-radius: 8px;
             margin-bottom: 20px;
             font-size: 14px;
+            border: 1px solid;
         }
-        
+
         .alert-error {
-            background: #fee;
-            color: #c33;
-            border-left: 4px solid #c33;
+            background: rgba(248, 81, 73, 0.1);
+            color: var(--error-color);
+            border-color: var(--error-color);
         }
-        
+
         .alert-success {
-            background: #efe;
-            color: #3c3;
-            border-left: 4px solid #3c3;
+            background: rgba(63, 185, 80, 0.1);
+            color: var(--success-color);
+            border-color: var(--success-color);
         }
-        
+
+        /* Results Section */
         .results-section {
-            background: white;
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background: var(--bg-secondary);
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-md);
         }
-        
+
         .results-header {
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #f0f0f0;
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
         }
-        
+
         .results-header h2 {
-            font-size: 20px;
-            color: #333;
-            margin-bottom: 8px;
+            font-size: 22px;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+            font-weight: 600;
         }
-        
+
         .results-stats {
-            font-size: 13px;
-            color: #888;
+            font-size: 14px;
+            color: var(--text-secondary);
         }
-        
+
+        .results-stats strong {
+            color: var(--accent-primary);
+        }
+
+        /* Result Files */
         .result-file {
-            margin-bottom: 25px;
-            border: 1px solid #f0f0f0;
-            border-radius: 4px;
+            margin-bottom: 24px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
             overflow: hidden;
+            background: var(--bg-primary);
         }
-        
+
         .result-file-header {
-            background: #f9f9f9;
-            padding: 12px 15px;
-            border-bottom: 1px solid #e0e0e0;
+            background: var(--bg-tertiary);
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-        
+
         .result-file-name {
             font-weight: 600;
-            color: #333;
+            color: var(--text-primary);
             word-break: break-all;
             flex: 1;
+            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+            font-size: 13px;
         }
-        
+
         .match-count {
-            background: #667eea;
+            background: var(--accent-gradient);
             color: white;
-            padding: 3px 10px;
+            padding: 4px 12px;
             border-radius: 12px;
             font-size: 12px;
             font-weight: 600;
             white-space: nowrap;
-            margin-left: 10px;
+            margin-left: 12px;
         }
-        
+
         .result-lines {
             list-style: none;
         }
-        
+
         .result-line {
             padding: 0;
-            border-bottom: 1px solid #f0f0f0;
+            border-bottom: 1px solid var(--border-color);
             display: flex;
             font-size: 13px;
         }
-        
+
         .result-line:last-child {
             border-bottom: none;
         }
-        
+
         .line-number {
-            background: #f9f9f9;
-            color: #888;
-            padding: 10px 12px;
-            min-width: 50px;
+            background: var(--bg-tertiary);
+            color: var(--text-muted);
+            padding: 12px 14px;
+            min-width: 60px;
             text-align: right;
-            border-right: 1px solid #e0e0e0;
-            font-family: 'Monaco', 'Courier New', monospace;
+            border-right: 1px solid var(--border-color);
+            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
             font-size: 12px;
             flex-shrink: 0;
+            user-select: none;
         }
-        
+
         .line-content {
-            padding: 10px 15px;
+            padding: 12px 16px;
             flex: 1;
-            font-family: 'Monaco', 'Courier New', monospace;
+            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
             overflow-x: auto;
             white-space: pre-wrap;
             word-break: break-word;
+            color: var(--text-secondary);
         }
-        
+
         .line-content strong {
-            background: #fffacd;
-            color: #333;
+            background: var(--highlight-match);
+            color: #f0f6fc;
             font-weight: 600;
-            padding: 0 2px;
+            padding: 2px 4px;
+            border-radius: 3px;
         }
-        
+
+        /* No Results */
         .no-results {
             text-align: center;
-            padding: 50px 20px;
-            color: #999;
+            padding: 60px 20px;
+            color: var(--text-muted);
             font-size: 16px;
         }
-        
+
         .no-results svg {
-            width: 60px;
-            height: 60px;
-            margin-bottom: 15px;
-            opacity: 0.5;
+            width: 64px;
+            height: 64px;
+            margin-bottom: 16px;
+            opacity: 0.4;
         }
-        
+
+        /* Footer */
         .footer {
             text-align: center;
-            margin-top: 30px;
-            padding: 20px;
-            color: #888;
-            font-size: 12px;
+            margin-top: 40px;
+            padding: 30px 20px;
+            color: var(--text-muted);
+            font-size: 13px;
+            border-top: 1px solid var(--border-color);
         }
-        
+
         .footer a {
-            color: #667eea;
+            color: var(--accent-primary);
             text-decoration: none;
+            transition: color 0.2s;
         }
-        
+
         .footer a:hover {
+            color: var(--accent-secondary);
             text-decoration: underline;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🔍 Text Search Engine</h1>
-            <p>Search for text patterns across server files - Fast, Secure, and Reliable</p>
+            <h1>🔍 GrepSearch</h1>
+            <p>Modern text search engine - Fast, secure, and powerful pattern matching across your files</p>
         </div>
-        
+
         <form class="search-form" method="POST" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF'], ENT_QUOTES, 'UTF-8'); ?>">
             <div class="form-group">
                 <label for="searchstr">Search Pattern</label>
-                <input 
-                    type="text" 
+                <input
+                    type="text"
                     id="searchstr"
-                    name="searchstr" 
+                    name="searchstr"
                     value="<?php echo isset($_POST['searchstr']) ? htmlspecialchars($_POST['searchstr'], ENT_QUOTES, 'UTF-8') : ''; ?>"
-                    placeholder="Enter text to search..."
+                    placeholder="Enter text or regex pattern to search..."
                     maxlength="100"
                     required
+                    autofocus
                 />
-                <div class="help-text">Enter the text pattern you want to find</div>
+                <div class="help-text">💡 Tip: Use regular expressions for advanced pattern matching</div>
             </div>
-            
+
             <div class="form-row">
                 <div>
-                    <label for="includefiles">Include Files (comma-separated)</label>
-                    <input 
+                    <label for="includefiles">Include File Types</label>
+                    <input
                         type="text"
                         id="includefiles"
-                        name="includefiles" 
+                        name="includefiles"
                         value="<?php echo isset($_POST['includefiles']) ? htmlspecialchars($_POST['includefiles'], ENT_QUOTES, 'UTF-8') : ''; ?>"
-                        placeholder="e.g., *.php, *.html"
+                        placeholder="e.g., *.php, *.js, *.md"
                     />
-                    <div class="help-text">Leave empty to search all files. Use wildcards: *.php, *.txt</div>
+                    <div class="help-text">Filter by extension. Leave empty for all files</div>
                 </div>
-                
+
                 <div>
-                    <label for="excludefiles">Exclude Files (comma-separated)</label>
-                    <input 
+                    <label for="excludefiles">Exclude File Types</label>
+                    <input
                         type="text"
                         id="excludefiles"
-                        name="excludefiles" 
+                        name="excludefiles"
                         value="<?php echo isset($_POST['excludefiles']) ? htmlspecialchars($_POST['excludefiles'], ENT_QUOTES, 'UTF-8') : ''; ?>"
-                        placeholder="e.g., *.min.js, *.log"
+                        placeholder="e.g., *.min.js, *.log, node_modules/*"
                     />
-                    <div class="help-text">Files to skip: *.min.js, node_modules/*, etc</div>
+                    <div class="help-text">Skip these files from search</div>
                 </div>
             </div>
-            
+
             <div class="checkbox-group">
                 <div class="checkbox-item">
-                    <input 
-                        type="checkbox" 
+                    <input
+                        type="checkbox"
                         id="matchcase"
-                        name="matchcase" 
+                        name="matchcase"
                         value="1"
                         <?php echo isset($_POST['matchcase']) ? 'checked' : ''; ?>
                     />
                     <label for="matchcase">Match Case</label>
                 </div>
-                
+
                 <div class="checkbox-item">
-                    <input 
-                        type="checkbox" 
+                    <input
+                        type="checkbox"
                         id="recursive"
-                        name="recursive" 
+                        name="recursive"
                         value="1"
                         <?php echo isset($_POST['recursive']) ? 'checked' : ''; ?>
                     />
-                    <label for="recursive">Recursive Search (subfolders)</label>
+                    <label for="recursive">Recursive (subfolders)</label>
                 </div>
-                
+
                 <div class="checkbox-item">
-                    <input 
-                        type="checkbox" 
+                    <input
+                        type="checkbox"
                         id="useregex"
-                        name="useregex" 
+                        name="useregex"
                         value="1"
                         <?php echo isset($_POST['useregex']) ? 'checked' : ''; ?>
                     />
-                    <label for="useregex">Use Regular Expressions</label>
+                    <label for="useregex">Regex Mode</label>
                 </div>
             </div>
-            
+
             <div class="form-actions">
                 <button type="submit" class="btn-primary">🔎 Search</button>
                 <button type="reset" class="btn-secondary">Clear</button>
@@ -859,19 +967,19 @@ $searchResult = $controller->handleRequest();
         <?php if (!empty($searchResult)): ?>
             <?php if (isset($searchResult['error'])): ?>
                 <div class="alert alert-error">
-                    <strong>Error:</strong> <?php echo htmlspecialchars($searchResult['error'], ENT_QUOTES, 'UTF-8'); ?>
+                    <strong>⚠️ Error:</strong> <?php echo htmlspecialchars($searchResult['error'], ENT_QUOTES, 'UTF-8'); ?>
                 </div>
             <?php elseif ($searchResult['success']): ?>
                 <div class="results-section">
                     <div class="results-header">
-                        <h2>Search Results</h2>
+                        <h2>📊 Search Results</h2>
                         <div class="results-stats">
-                            Found <strong><?php echo $searchResult['resultCount']; ?></strong> file(s) 
-                            with <strong><?php echo $searchResult['totalMatches']; ?></strong> match(es)
-                            in <?php echo htmlspecialchars($searchResult['searchType'], ENT_QUOTES, 'UTF-8'); ?> mode
+                            Found <strong><?php echo $searchResult['resultCount']; ?></strong> file(s)
+                            with <strong><?php echo $searchResult['totalMatches']; ?></strong> total match(es)
+                            · <?php echo htmlspecialchars($searchResult['searchType'], ENT_QUOTES, 'UTF-8'); ?> search
                         </div>
                     </div>
-                    
+
                     <?php if (!empty($searchResult['results'])): ?>
                         <?php foreach ($searchResult['results'] as $file => $fileData): ?>
                             <div class="result-file">
@@ -899,10 +1007,10 @@ $searchResult = $controller->handleRequest();
                 </div>
             <?php endif; ?>
         <?php endif; ?>
-        
+
         <div class="footer">
-            <p>Text Search Engine v2.0 | Modern implementation with security hardening</p>
-            <p>© 2025 | Licensed under GNU LGPL v3</p>
+            <p>GrepSearch v2.0 · Modern secure text search engine</p>
+            <p>© 2025 · Licensed under GNU LGPL v3</p>
         </div>
     </div>
 </body>
