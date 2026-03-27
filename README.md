@@ -216,6 +216,7 @@ Distribuido bajo [GNU LGPL v3](LICENSE)
 **Créditos:**
 - Original (2005): Alejandro Vásquez
 - Modernización (2025): Mejoras de seguridad y funcionalidad
+- Modernización (2026): Mejoras UI/UX y modo oscuro.
 
 ---
 
