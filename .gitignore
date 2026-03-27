@@ -1,0 +1,12 @@
+# Archivos temporales
+*.tmp
+*.log
+.DS_Store
+
+# Configuración local sensible
+.env
+config.local.php
+
+# Dependencias (si usas Composer)
+/vendor/
+composer.lock
