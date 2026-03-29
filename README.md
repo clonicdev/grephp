@@ -1,4 +1,4 @@
-# 🔍 GrepSearch - Modern Text Search Engine
+# 🔍 Grephp - Modern Text Search Engine
 
 Buscador de patrones de texto en archivos del servidor. Rápido, seguro y sin dependencias.
 
@@ -19,7 +19,7 @@ Buscador de patrones de texto en archivos del servidor. Rápido, seguro y sin de
 
 ---
 
-## 🎯 ¿Qué es GrepSearch?
+## 🎯 ¿Qué es Grephp?
 
 Una herramienta web para buscar texto/patrones en archivos de tu servidor, reemplazando comandos `grep` con una interfaz moderna y segura.
 
@@ -144,7 +144,7 @@ $results = $engine->search(
 
 ## 🔐 Seguridad
 
-GrepSearch está diseñado con seguridad por defecto:
+Grephp está diseñado con seguridad por defecto:
 
 - ✅ Sin `exec()`, `system()` - PHP puro
 - ✅ Validación de directorios (previene directory traversal)
